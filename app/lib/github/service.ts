@@ -1,4 +1,4 @@
-import { GitHubCommit, GitHubPR, GitHubSearchResult } from "./types"
+import { GitHubCommit, GitHubPR, GitHubSearchResult, GitHubCommitDetail } from "./types"
 
 const GITHUB_API_BASE = "https://api.github.com"
 
@@ -79,6 +79,51 @@ export async function fetchDailyPRs(date: Date, username: string): Promise<GitHu
   return data.items
 }
 
-export async function fetchUserEvents(username: string): Promise<any[]> {
+export async function fetchUserEvents<T>(username: string): Promise<T> {
     return githubFetch(`/users/${username}/events`)
+}
+
+/**
+ * Fetch detailed information for a specific commit, including file changes.
+ */
+export async function fetchCommitDetails(owner: string, repo: string, ref: string): Promise<GitHubCommitDetail> {
+  return githubFetch<GitHubCommitDetail>(`/repos/${owner}/${repo}/commits/${ref}`)
+}
+
+export async function fetchUserContributions(username: string) {
+  const token = process.env.NEXT_PUBLIC_GITHUB_TOKEN
+  if (!token) throw new Error("Missing GitHub Token")
+
+  const query = `
+    query($username: String!) {
+      user(login: $username) {
+        contributionsCollection {
+          contributionCalendar {
+            totalContributions
+            weeks {
+              contributionDays {
+                contributionCount
+                date
+              }
+            }
+          }
+        }
+      }
+    }
+  `
+
+  const res = await fetch("https://api.github.com/graphql", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ query, variables: { username } }),
+  })
+
+  if (!res.ok) {
+      throw new Error("Failed to fetch contributions")
+  }
+
+  return res.json()
 }

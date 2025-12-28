@@ -19,6 +19,41 @@ export type GitHubCommit = {
   }
   html_url: string
   author: GitHubUser | null
+  repository: {
+    full_name: string
+    name: string
+    owner: {
+      login: string
+    }
+  }
+}
+
+export type GitHubFile = {
+  sha: string
+  filename: string
+  status: "added" | "removed" | "modified" | "renamed" | "copied" | "changed" | "unchanged"
+  additions: number
+  deletions: number
+  changes: number
+  blob_url: string
+  raw_url: string
+  contents_url: string
+  patch?: string
+}
+
+export type GitHubCommitDetail = {
+  sha: string
+  node_id: string
+  commit: GitHubCommit["commit"]
+  url: string
+  html_url: string
+  author: GitHubUser | null
+  files: GitHubFile[]
+  stats: {
+    total: number
+    additions: number
+    deletions: number
+  }
 }
 
 export type GitHubPR = {

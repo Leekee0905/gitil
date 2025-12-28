@@ -1,11 +1,11 @@
 "use server"
 
 import { createClient } from "@/app/lib/supabase/server"
-import { fetchDailyCommits, fetchDailyPRs } from "@/app/lib/github/service"
-import { GitHubCommit, GitHubPR } from "@/app/lib/github/types"
+import { fetchDailyCommits, fetchDailyPRs, fetchCommitDetails } from "@/app/lib/github/service"
+import { GitHubCommit, GitHubPR, GitHubCommitDetail } from "@/app/lib/github/types"
 
 export type FetchResult<T> = {
-  data: T[] | null
+  data: T | null
   error: string | null
 }
 
@@ -19,7 +19,7 @@ async function getGitHubUsername(): Promise<string | null> {
   return user.user_metadata?.user_name || user.user_metadata?.preferred_username || null
 }
 
-export async function getDailyCommits(date: Date): Promise<FetchResult<GitHubCommit>> {
+export async function getDailyCommits(date: Date): Promise<FetchResult<GitHubCommit[]>> {
   try {
     const username = await getGitHubUsername()
     if (!username) {
@@ -34,7 +34,7 @@ export async function getDailyCommits(date: Date): Promise<FetchResult<GitHubCom
   }
 }
 
-export async function getDailyPRs(date: Date): Promise<FetchResult<GitHubPR>> {
+export async function getDailyPRs(date: Date): Promise<FetchResult<GitHubPR[]>> {
   try {
     const username = await getGitHubUsername()
     if (!username) {
@@ -47,4 +47,22 @@ export async function getDailyPRs(date: Date): Promise<FetchResult<GitHubPR>> {
      console.error("Failed to fetch daily PRs:", error)
      return { data: null, error: error instanceof Error ? error.message : "Unknown error" }
   }
+}
+
+export async function getCommitDetails(owner: string, repo: string, ref: string): Promise<FetchResult<GitHubCommitDetail>> {
+    try {
+        // We verify auth just to be safe, though usage might be open if repo is public.
+        // But the token usage in service layer implies we are acting as the user.
+        const username = await getGitHubUsername()
+        if (!username) {
+             return { data: null, error: "User not authenticated." }
+        }
+
+        const details = await fetchCommitDetails(owner, repo, ref)
+        return { data: details, error: null }
+
+    } catch (error) {
+        console.error("Failed to fetch commit details:", error)
+        return { data: null, error: error instanceof Error ? error.message : "Unknown error" }
+    }
 }
