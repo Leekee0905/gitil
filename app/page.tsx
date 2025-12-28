@@ -1,9 +1,11 @@
 import { PostGrid } from "@/components/post-grid";
 
 export default function Home() {
+  
   const posts = [
     {
       title: "Learning Next.js Server Components",
+      slug: "learning-nextjs-server-components",
       author: "leekee0905",
       date: "2023-10-27",
       summary: "Today I dove deep into Next.js Server Components and how they differ from Client Components. It's fascinating how much logic we can move to the server.",
@@ -11,6 +13,7 @@ export default function Home() {
     },
     {
       title: "Setting up Supabase Auth",
+      slug: "setting-up-supabase-auth",
       author: "dev_guru",
       date: "2023-10-26",
       summary: "Implemented GitHub OAuth login using Supabase helpers for Next.js. The process was smoother than expected.",
@@ -18,6 +21,7 @@ export default function Home() {
     },
     {
       title: "Tailwind CSS Configuration Tips",
+      slug: "tailwind-css-configuration-tips",
       author: "css_wizard",
       date: "2023-10-25",
       summary: "Shared some tips on how to configure Tailwind v4 for optimal performance and theming.",
@@ -25,6 +29,7 @@ export default function Home() {
     },
     {
       title: "Optimizing React Re-renders with useMemo",
+      slug: "optimizing-react-re-renders-with-usememo",
       author: "perf_master",
       date: "2023-10-24",
       summary: "A deep dive into when and just as importantly, when NOT to use useMemo. Benchmarks included!",
@@ -32,6 +37,7 @@ export default function Home() {
     },
     {
       title: "Building Accessible Forms",
+      slug: "building-accessible-forms",
       author: "a11y_advocate",
       date: "2023-10-23",
       summary: "Accessibility should not be an afterthought. Here are 5 quick wins for better form a11y.",
@@ -39,6 +45,7 @@ export default function Home() {
     },
     {
       title: "TypeScript Utility Types Explained",
+      slug: "typescript-utility-types-explained",
       author: "ts_fan",
       date: "2023-10-22",
       summary: "Partial, Pick, Omit, Record... clarifying the confusing world of mapped types.",

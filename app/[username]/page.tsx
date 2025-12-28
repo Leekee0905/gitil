@@ -10,27 +10,43 @@ interface PageProps {
   }>
 }
 
+import { fetchUserContributions } from "@/app/lib/github/service"
+
+import { getPostsByUsername } from "@/app/lib/mock-data"
+
 export default async function ProfilePage(props: PageProps) {
   const params = await props.params;
   const username = params.username
 
-  // Mock data - in real app, fetch based on username
-  const posts = [
-    {
-      title: "Learning Next.js Server Components",
-      author: username,
-      date: "2023-10-27",
-      summary: "Today I dove deep into Next.js Server Components and how they differ from Client Components. It's fascinating how much logic we can move to the server.",
-      tags: ["Next.js", "React", "Server Components"],
-    },
-    {
-      title: "Building Accessible Forms",
-      author: username,
-      date: "2023-10-23",
-      summary: "Accessibility should not be an afterthought. Here are 5 quick wins for better form a11y.",
-      tags: ["A11y", "HTML", "Forms"],
-    },
-  ];
+  let contributionData: any[] = []
+  let totalContributions = 0
+  
+  try {
+      const res = await fetchUserContributions(username)
+      // console.log("GraphQL Response:", JSON.stringify(res, null, 2)) 
+
+      const calendar = res.data?.user?.contributionsCollection?.contributionCalendar
+      if (calendar) {
+          totalContributions = calendar.totalContributions
+          contributionData = calendar.weeks.flatMap((week: any) => 
+            week.contributionDays.map((day: any) => ({
+                date: day.date,
+                count: day.contributionCount,
+                level: day.contributionCount === 0 ? 0 : 
+                       day.contributionCount <= 3 ? 1 :
+                       day.contributionCount <= 6 ? 2 :
+                       day.contributionCount <= 10 ? 3 : 4
+            }))
+          )
+      } else {
+          console.warn("No calendar data found in response")
+      }
+  } catch (e) {
+      console.error("Failed to fetch contributions", e)
+  }
+
+  // Fetch mock posts
+  const posts = getPostsByUsername(username)
 
   return (
     <div className="relative min-h-screen">
@@ -54,7 +70,7 @@ export default async function ProfilePage(props: PageProps) {
                    <Calendar className="size-5" />
                  </div>
                  <div>
-                   <div className="font-bold text-xl">127</div>
+                   <div className="font-bold text-xl">{totalContributions}</div>
                    <div className="text-xs text-zinc-500">Total TILs</div>
                  </div>
                </div>
@@ -78,12 +94,10 @@ export default async function ProfilePage(props: PageProps) {
 
         {/* User Content */}
         <section>
-          <div className="mb-12">
-             <h2 className="text-xl font-bold mb-6">Contribution Activity</h2>
-             <ContributionGraph />
-          </div>
+            <h2 className="text-xl font-bold mb-4">Contribution Graph</h2>
+             <ContributionGraph data={contributionData} />
 
-          <div className="mb-6">
+          <div className="my-6">
              <h2 className="text-xl font-bold mb-4">Latest Posts</h2>
              <PostGrid posts={posts} />
           </div>
