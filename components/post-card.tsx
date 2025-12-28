@@ -1,11 +1,13 @@
 "use client"
 
+
 import Link from "next/link"
 import { CalendarDays, GitCommit, ArrowUpRight } from "lucide-react"
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { motion } from "motion/react"
 
 interface PostCardProps {
+  slug: string
   title: string
   author: string
   date: string
@@ -14,7 +16,7 @@ interface PostCardProps {
   index?: number
 }
 
-export function PostCard({ title, author, date, summary, tags = [], index = 0 }: PostCardProps) {
+export function PostCard({ slug, title, author, date, summary, tags = [], index = 0 }: PostCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -22,12 +24,13 @@ export function PostCard({ title, author, date, summary, tags = [], index = 0 }:
       transition={{ duration: 0.3, delay: index * 0.1 }}
       whileHover={{ y: -5 }}
     >
+      <Link href={`/${author}/${slug}`}>
       <Card className="h-full border-zinc-200 dark:border-zinc-800 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm hover:border-green-500/50 dark:hover:border-green-500/50 hover:shadow-lg hover:shadow-green-500/10 transition-all duration-300 group cursor-pointer">
         <CardHeader className="p-4 pb-2 space-y-2">
           <div className="flex items-start justify-between gap-2">
-            <Link href="#" className="font-semibold text-lg leading-tight group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors line-clamp-2">
+            <span className="font-semibold text-lg leading-tight group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors line-clamp-2">
               {title}
-            </Link>
+            </span>
             <ArrowUpRight className="size-4 text-zinc-400 opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
           <div className="flex items-center gap-3 text-xs text-zinc-500 font-mono">
@@ -57,6 +60,7 @@ export function PostCard({ title, author, date, summary, tags = [], index = 0 }:
           ))}
         </CardFooter>
       </Card>
+      </Link>
     </motion.div>
   )
 }

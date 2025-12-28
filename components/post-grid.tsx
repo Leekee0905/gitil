@@ -4,6 +4,7 @@ import { PostCard } from "@/components/post-card"
 import { motion } from "motion/react"
 
 interface Post {
+  slug: string
   title: string
   author: string
   date: string
